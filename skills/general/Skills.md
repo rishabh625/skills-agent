@@ -1,6 +1,6 @@
 ---
 name: create-pull-request
-description: Create a standards-compliant pull request for GitOps repository changes with traceable evidence and rollback notes. Use when repository modifications are ready for review in Helm or Kustomize based deployments.
+description: Create a standard-compliant pull request for GitOps repository changes with traceable evidence and rollback notes. Use when repository modifications are ready for review in Helm or Kustomize based deployments.
 license: Apache-2.0
 compatibility: Requires MCP connectivity to Git, Argo, and Kubernetes servers. No CLI tools required.
 metadata:

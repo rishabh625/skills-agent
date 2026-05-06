@@ -83,7 +83,7 @@ jobs:
             --project ${{ vars.STAGING_PROJECT_ID }} \
             --region ${{ vars.REGION }} \
             --image ${{ vars.REGION }}-docker.pkg.dev/${{ vars.CICD_PROJECT_ID }}/${{ vars.ARTIFACT_REGISTRY_REPO_NAME }}/${{ vars.CONTAINER_NAME }}:${{ github.sha }} \
-            --set-env-vars MCP_OAUTH_GOOGLE_CLIENT_ID=${{ secrets.MCP_OAUTH_GOOGLE_CLIENT_ID }},MCP_OAUTH_GOOGLE_CLIENT_SECRET=${{ secrets.MCP_OAUTH_GOOGLE_CLIENT_SECRET }},MCP_OAUTH_SIGNING_KEY=${{ secrets.MCP_OAUTH_SIGNING_KEY }},MCP_OAUTH_ALLOWED_DOMAIN=${{ vars.MCP_OAUTH_ALLOWED_DOMAIN }} \
+            --set-env-vars APP_MODE=mcp,MCP_OAUTH_GOOGLE_CLIENT_ID=${{ secrets.MCP_OAUTH_GOOGLE_CLIENT_ID }},MCP_OAUTH_GOOGLE_CLIENT_SECRET=${{ secrets.MCP_OAUTH_GOOGLE_CLIENT_SECRET }},MCP_OAUTH_SIGNING_KEY=${{ secrets.MCP_OAUTH_SIGNING_KEY }},MCP_OAUTH_ALLOWED_DOMAIN=${{ vars.MCP_OAUTH_ALLOWED_DOMAIN }} \
             --quiet
 
       - name: Deploy to Staging (Agent Engine / Agent Runtime)
