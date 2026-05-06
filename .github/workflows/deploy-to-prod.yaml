@@ -85,6 +85,14 @@ jobs:
             --region ${{ vars.REGION }} \
             --image ${{ vars.REGION }}-docker.pkg.dev/${{ vars.CICD_PROJECT_ID }}/${{ vars.ARTIFACT_REGISTRY_REPO_NAME }}/${{ vars.CONTAINER_NAME }}:${{ github.sha }}
 
+      - name: Deploy to Production (MCP Cloud Run)
+        run: |
+          gcloud run deploy ${{ vars.CONTAINER_NAME }}-mcp \
+            --project ${{ vars.PROD_PROJECT_ID }} \
+            --region ${{ vars.REGION }} \
+            --image ${{ vars.REGION }}-docker.pkg.dev/${{ vars.CICD_PROJECT_ID }}/${{ vars.ARTIFACT_REGISTRY_REPO_NAME }}/${{ vars.CONTAINER_NAME }}:${{ github.sha }} \
+            --quiet
+
       - name: Deploy to Production (Agent Engine / Agent Runtime)
         run: |
           cp pyproject.toml pyproject.toml.bak

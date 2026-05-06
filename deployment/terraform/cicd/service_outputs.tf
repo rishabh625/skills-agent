@@ -21,3 +21,13 @@ output "cloud_run_service_names" {
   description = "Cloud Run service names by environment"
   value       = { for k, v in google_cloud_run_v2_service.app : k => v.name }
 }
+
+output "cloud_run_mcp_service_urls" {
+  description = "Cloud Run MCP service URLs by environment"
+  value       = { for k, v in google_cloud_run_v2_service.mcp : k => v.uri }
+}
+
+output "cloud_run_mcp_service_names" {
+  description = "Cloud Run MCP service names by environment"
+  value       = { for k, v in google_cloud_run_v2_service.mcp : k => v.name }
+}

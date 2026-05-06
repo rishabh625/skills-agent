@@ -14,7 +14,6 @@
 # limitations under the License.
 
 import datetime
-from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from google.adk.agents import Agent
@@ -25,31 +24,12 @@ from google.genai import types
 import os
 import google.auth
 
+from app.skills_registry import load_all_skills_markdown
+
 _, project_id = google.auth.default()
 os.environ["GOOGLE_CLOUD_PROJECT"] = project_id
 os.environ["GOOGLE_CLOUD_LOCATION"] = "global"
 os.environ["GOOGLE_GENAI_USE_VERTEXAI"] = "True"
-
-def load_skills_markdown() -> str:
-    skills_dir = Path(__file__).resolve().parents[1] / "skills"
-    if not skills_dir.exists():
-        return ""
-
-    blocks: list[str] = []
-    for tool_dir in sorted([p for p in skills_dir.iterdir() if p.is_dir()]):
-        skill_file = tool_dir / "Skills.md"
-        if not skill_file.exists():
-            continue
-
-        content = skill_file.read_text(encoding="utf-8").strip()
-        if not content:
-            continue
-        blocks.append(f"## {tool_dir.name}\n{content}")
-
-    if not blocks:
-        return ""
-
-    return "\n\n".join(blocks)
 
 
 def get_weather(query: str) -> str:
@@ -94,7 +74,7 @@ root_agent = Agent(
     instruction=(
         "You are a helpful AI assistant designed to provide accurate and useful information.\n\n"
         "### Skills\n"
-        f"{load_skills_markdown()}"
+        f"{load_all_skills_markdown()}"
     ),
     tools=[get_weather, get_current_time],
 )

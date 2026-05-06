@@ -83,3 +83,69 @@ resource "google_cloud_run_v2_service" "app" {
     google_project_service.deploy_project_services,
   ]
 }
+
+resource "google_cloud_run_v2_service" "mcp" {
+  for_each = local.deploy_project_ids
+
+  name                = "${var.project_name}-mcp"
+  location            = var.region
+  project             = each.value
+  deletion_protection = false
+  ingress             = "INGRESS_TRAFFIC_ALL"
+  labels = {
+    "created-by" = "adk"
+  }
+
+  template {
+    containers {
+      image = "us-docker.pkg.dev/cloudrun/container/hello"
+      resources {
+        limits = {
+          cpu    = "2"
+          memory = "2Gi"
+        }
+        cpu_idle = true
+      }
+
+      env {
+        name  = "LOGS_BUCKET_NAME"
+        value = google_storage_bucket.logs_data_bucket[each.value].name
+      }
+
+      env {
+        name  = "OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT"
+        value = "NO_CONTENT"
+      }
+
+      env {
+        name  = "APP_MODE"
+        value = "mcp"
+      }
+    }
+
+    service_account                  = google_service_account.app_sa[each.key].email
+    max_instance_request_concurrency = 80
+
+    scaling {
+      min_instance_count = 1
+      max_instance_count = 10
+    }
+
+    session_affinity = false
+  }
+
+  traffic {
+    type    = "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST"
+    percent = 100
+  }
+
+  lifecycle {
+    ignore_changes = [
+      template[0].containers[0].image,
+    ]
+  }
+
+  depends_on = [
+    google_project_service.deploy_project_services,
+  ]
+}
