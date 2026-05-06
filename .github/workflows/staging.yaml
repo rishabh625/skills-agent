@@ -86,14 +86,14 @@ jobs:
             --set-env-vars MCP_OAUTH_GOOGLE_CLIENT_ID=${{ secrets.MCP_OAUTH_GOOGLE_CLIENT_ID }},MCP_OAUTH_GOOGLE_CLIENT_SECRET=${{ secrets.MCP_OAUTH_GOOGLE_CLIENT_SECRET }},MCP_OAUTH_SIGNING_KEY=${{ secrets.MCP_OAUTH_SIGNING_KEY }},MCP_OAUTH_ALLOWED_DOMAIN=${{ vars.MCP_OAUTH_ALLOWED_DOMAIN }} \
             --quiet
 
-      - name: Allow Remote Access to MCP (Staging)
-        run: |
-          gcloud run services add-iam-policy-binding ${{ vars.CONTAINER_NAME }}-mcp \
-            --project ${{ vars.STAGING_PROJECT_ID }} \
-            --region ${{ vars.REGION }} \
-            --member="allUsers" \
-            --role="roles/run.invoker" \
-            --quiet
+#      - name: Allow Remote Access to MCP (Staging)
+#        run: |
+#          gcloud run services add-iam-policy-binding ${{ vars.CONTAINER_NAME }}-mcp \
+#            --project ${{ vars.STAGING_PROJECT_ID }} \
+#            --region ${{ vars.REGION }} \
+#            --member="allUsers" \
+#            --role="roles/run.invoker" \
+#            --quiet
 
       - name: Deploy to Staging (Agent Engine / Agent Runtime)
         run: |
