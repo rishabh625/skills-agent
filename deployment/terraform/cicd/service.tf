@@ -149,3 +149,15 @@ resource "google_cloud_run_v2_service" "mcp" {
     google_project_service.deploy_project_services,
   ]
 }
+
+resource "google_cloud_run_v2_service_iam_member" "mcp_public_invoker" {
+  for_each = {
+    staging = local.deploy_project_ids["staging"]
+  }
+
+  project  = each.value
+  location = var.region
+  name     = google_cloud_run_v2_service.mcp[each.key].name
+  role     = "roles/run.invoker"
+  member   = "allUsers"
+}

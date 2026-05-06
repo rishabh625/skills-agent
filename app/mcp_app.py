@@ -79,6 +79,10 @@ def _signing_key() -> bytes:
 
 
 def _base_url(request: Request) -> str:
+    proto = request.headers.get("x-forwarded-proto") or request.url.scheme
+    host = request.headers.get("x-forwarded-host") or request.headers.get("host")
+    if host:
+        return f"{proto}://{host}".rstrip("/")
     return str(request.base_url).rstrip("/")
 
 
