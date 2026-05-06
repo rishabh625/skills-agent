@@ -279,7 +279,9 @@ for _tool_name in list_skill_names():
     _make_tool(_tool_name)
 
 
-app = FastAPI()
+mcp_asgi = mcp.http_app(path="/", transport="streamable-http", stateless_http=True)
+
+app = FastAPI(lifespan=mcp_asgi.lifespan)
 
 
 @app.get("/healthz")
@@ -571,4 +573,4 @@ async def mcp_redirect() -> RedirectResponse:
     return RedirectResponse(url="/mcp/", status_code=307)
 
 
-app.mount("/mcp", mcp.http_app(path="/"))
+app.mount("/mcp", mcp_asgi)
