@@ -51,6 +51,11 @@ app.title = "skills-agent"
 app.description = "API for interacting with the Agent skills-agent"
 
 
+@app.get("/healthz")
+def healthz() -> dict[str, bool]:
+    return {"ok": True}
+
+
 @app.post("/feedback")
 def collect_feedback(feedback: Feedback) -> dict[str, str]:
     """Collect and log feedback.
