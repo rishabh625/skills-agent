@@ -164,6 +164,16 @@ def _google_authorize_url(request: Request, *, state: str) -> str:
     return f"https://accounts.google.com/o/oauth2/v2/auth?{urllib.parse.urlencode(params)}"
 
 
+def _append_query_params(url: str, params: dict[str, str]) -> str:
+    parsed = urllib.parse.urlsplit(url)
+    query = dict(urllib.parse.parse_qsl(parsed.query, keep_blank_values=True))
+    query.update(params)
+    new_query = urllib.parse.urlencode(query)
+    return urllib.parse.urlunsplit(
+        (parsed.scheme, parsed.netloc, parsed.path, new_query, parsed.fragment)
+    )
+
+
 def _google_exchange_code(request: Request, code: str) -> dict:
     token_endpoint = "https://oauth2.googleapis.com/token"
     data = {
@@ -453,8 +463,12 @@ async def oauth_google_callback(request: Request) -> Response:
     if cursor_state:
         redirect_params["state"] = cursor_state
 
+    redirect_uri = str(state_payload.get("redirect_uri") or "")
+    if not redirect_uri or redirect_uri not in _allowed_redirect_uris():
+        return HTMLResponse("Invalid redirect_uri", status_code=400)
+
     return RedirectResponse(
-        url=f"{_cursor_redirect_uri()}?{urllib.parse.urlencode(redirect_params)}",
+        url=_append_query_params(redirect_uri, redirect_params),
         status_code=302,
     )
 
