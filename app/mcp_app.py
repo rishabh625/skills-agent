@@ -136,6 +136,17 @@ def _cursor_redirect_uri() -> str:
     return "cursor://anysphere.cursor-mcp/oauth/callback"
 
 
+def _allowed_redirect_uris() -> set[str]:
+    allowed = {_cursor_redirect_uri()}
+    raw = os.environ.get("MCP_OAUTH_ALLOWED_REDIRECT_URIS", "").strip()
+    if raw:
+        for uri in raw.split(","):
+            uri = uri.strip()
+            if uri:
+                allowed.add(uri)
+    return allowed
+
+
 def _google_redirect_uri(request: Request) -> str:
     return f"{_base_url(request)}/oauth/google/callback"
 
@@ -325,8 +336,8 @@ async def oauth_register(request: Request) -> JSONResponse:
     if not isinstance(redirect_uris, list):
         redirect_uris = []
 
-    allowed_redirect = _cursor_redirect_uri()
-    if allowed_redirect not in redirect_uris:
+    allowed_redirect_uris = _allowed_redirect_uris()
+    if not redirect_uris or any(uri not in allowed_redirect_uris for uri in redirect_uris):
         return JSONResponse(
             {"error": "invalid_redirect_uri", "error_description": "unsupported redirect_uri"},
             status_code=400,
@@ -361,7 +372,7 @@ async def oauth_authorize(request: Request) -> Response:
     if response_type != "code" or not client_id or not redirect_uri:
         return HTMLResponse("Invalid request", status_code=400)
 
-    if redirect_uri != _cursor_redirect_uri():
+    if redirect_uri not in _allowed_redirect_uris():
         return HTMLResponse("Invalid redirect_uri", status_code=400)
 
     if code_challenge_method != "S256" or not code_challenge:
